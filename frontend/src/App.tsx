@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Users, ClipboardList, Zap, Plus, Radio, Activity, LayoutDashboard, AlertTriangle, Database } from 'lucide-react'
 
+// Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 // Types
 type Skill = 'Medical' | 'Security' | 'Translation' | 'Logistics' | 'Crowd Control';
 type Role = 'admin' | 'volunteer';
@@ -151,11 +154,11 @@ function App() {
   const fetchData = async () => {
     try {
       const [vRes, sRes, tRes, nRes, aRes] = await Promise.all([
-        fetch('http://localhost:3001/api/volunteers'),
-        fetch('http://localhost:3001/api/sectors'),
-        fetch('http://localhost:3001/api/tasks'),
-        fetch('http://localhost:3001/api/notifications'),
-        fetch('http://localhost:3001/api/analytics')
+        fetch(`${API_BASE_URL}/api/volunteers`),
+        fetch(`${API_BASE_URL}/api/sectors`),
+        fetch(`${API_BASE_URL}/api/tasks`),
+        fetch(`${API_BASE_URL}/api/notifications`),
+        fetch(`${API_BASE_URL}/api/analytics`)
       ])
       setVolunteers(await vRes.json())
       setSectors(await sRes.json())
@@ -179,7 +182,7 @@ function App() {
     e.preventDefault()
     setError('')
     try {
-      const res = await fetch('http://localhost:3001/api/login', {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginForm)
@@ -196,7 +199,7 @@ function App() {
   }
 
   const optimizeDeployment = async () => {
-    const res = await fetch('http://localhost:3001/api/optimize', { method: 'POST' })
+    const res = await fetch(`${API_BASE_URL}/api/optimize`, { method: 'POST' })
     const data = await res.json()
     if (data.assignments && data.assignments.length > 0) {
       setDispatchResults(data.assignments)
@@ -209,7 +212,7 @@ function App() {
   const handleBroadcast = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    await fetch('http://localhost:3001/api/notifications', {
+    await fetch(`${API_BASE_URL}/api/notifications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -620,7 +623,7 @@ function App() {
                         <>
                           <button 
                             onClick={async () => {
-                              await fetch(`http://localhost:3001/api/volunteers/${user.id}/checkout`, { method: 'POST' });
+                              await fetch(`${API_BASE_URL}/api/volunteers/${user.id}/checkout`, { method: 'POST' });
                               fetchData();
                             }}
                             className="secondary" 
@@ -632,7 +635,7 @@ function App() {
                           <button 
                             onClick={async () => {
                               const newSosState = !currentVolunteer.sos_active;
-                              await fetch(`http://localhost:3001/api/volunteers/${user.id}/sos`, {
+                              await fetch(`${API_BASE_URL}/api/volunteers/${user.id}/sos`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ active: newSosState })
@@ -649,7 +652,7 @@ function App() {
                         <form onSubmit={async (e) => {
                           e.preventDefault();
                           const formData = new FormData(e.currentTarget);
-                          await fetch(`http://localhost:3001/api/volunteers/${user.id}/checkin`, {
+                          await fetch(`${API_BASE_URL}/api/volunteers/${user.id}/checkin`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ sector_id: Number(formData.get('sId')) })
@@ -703,7 +706,7 @@ function App() {
                                     {Number(task.assigned_to) === Number(user.id) ? (
                                       <button 
                                         onClick={async () => {
-                                          await fetch(`http://localhost:3001/api/tasks/${task.id}/complete`, { method: 'POST' });
+                                          await fetch(`${API_BASE_URL}/api/tasks/${task.id}/complete`, { method: 'POST' });
                                           fetchData();
                                         }}
                                         style={{ background: 'var(--primary)', color: 'black', fontWeight: 900 }}
@@ -720,8 +723,8 @@ function App() {
                                         style={{ fontSize: '0.7rem', borderStyle: 'dashed' }}
                                         onClick={async () => {
                                           const volunteer = currentVolunteer?.name || 'Unknown Personnel';
-                                          await fetch(`http://localhost:3001/api/tasks/${task.id}/request-backup`, { method: 'POST' });
-                                          await fetch('http://localhost:3001/api/notifications', {
+                                          await fetch(`${API_BASE_URL}/api/tasks/${task.id}/request-backup`, { method: 'POST' });
+                                          await fetch(`${API_BASE_URL}/api/notifications`, {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({
@@ -740,7 +743,7 @@ function App() {
                                 ) : (
                                   <button 
                                     onClick={async () => {
-                                      await fetch(`http://localhost:3001/api/tasks/${task.id}/assign`, {
+                                      await fetch(`${API_BASE_URL}/api/tasks/${task.id}/assign`, {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ volunteer_id: user.id })
@@ -779,7 +782,7 @@ function App() {
             <form onSubmit={async (e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
-              await fetch('http://localhost:3001/api/tasks', {
+              await fetch(`${API_BASE_URL}/api/tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -827,7 +830,7 @@ function App() {
               const formData = new FormData(e.currentTarget);
               const skills = formData.getAll('skills');
               
-              await fetch('http://localhost:3001/api/volunteers', {
+              await fetch(`${API_BASE_URL}/api/volunteers`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

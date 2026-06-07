@@ -5,10 +5,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const dbPath = process.env.DATABASE_URL || path.join(__dirname, '../../database.sqlite');
+
 const db = knex({
   client: 'sqlite3',
   connection: {
-    filename: path.join(__dirname, '../../database.sqlite'),
+    filename: dbPath,
   },
   useNullAsDefault: true,
 });
@@ -38,11 +40,11 @@ export async function initDb() {
     });
 
     await db('sectors').insert([
-      { name: 'Sector A (Sangam)', capacity: 500, stress_level: 45 },
-      { name: 'Sector B (Railway Stn)', capacity: 300, stress_level: 60 },
-      { name: 'Sector C (Mela Area)', capacity: 1000, stress_level: 30 },
-      { name: 'Sector D (Food Court)', capacity: 200, stress_level: 20 },
-      { name: 'Sector E (Medical Camp)', capacity: 150, stress_level: 10 },
+      { name: 'Sector A (Sangam)', capacity: 500, stress_level: 0 },
+      { name: 'Sector B (Railway Stn)', capacity: 300, stress_level: 0 },
+      { name: 'Sector C (Mela Area)', capacity: 1000, stress_level: 0 },
+      { name: 'Sector D (Food Court)', capacity: 200, stress_level: 0 },
+      { name: 'Sector E (Medical Camp)', capacity: 150, stress_level: 0 },
     ]);
   } else {
     // Check for missing columns in existing sectors table
